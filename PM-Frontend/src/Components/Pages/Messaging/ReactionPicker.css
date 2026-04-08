@@ -1,0 +1,46 @@
+/* Reaction Picker Styles */
+.reaction-picker {
+  position: absolute;
+  bottom: 40px;
+  right: -35px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  width: 200px;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.reaction-option {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px 8px;
+  transition: all 0.2s;
+  border-radius: 6px;
+  flex: 0 0 calc(25% - 3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reaction-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.2);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .reaction-picker {
+    position: static;
+    width: 100%;
+    bottom: auto;
+    right: auto;
+    margin-top: 8px;
+  }
+}

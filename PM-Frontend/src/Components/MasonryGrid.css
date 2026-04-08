@@ -1,0 +1,156 @@
+/**
+ * Masonry Grid CSS
+ * Responsive masonry layout optimized for mobile and desktop
+ * Uses CSS columns for optimal performance
+ */
+
+.masonry-grid {
+  --gap: 12px;
+  --mobile-cols: 2;
+  --tablet-cols: 3;
+  --desktop-cols: 4;
+  
+  /* Mobile-first: 2 columns on small screens */
+  column-count: var(--mobile-cols);
+  column-gap: var(--gap);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.masonry-item {
+  /* Break out of column flow to ensure proper sizing */
+  break-inside: avoid;
+  margin-bottom: var(--gap);
+  
+  /* Ensure items take full column width */
+  width: 100%;
+  display: block;
+}
+
+/**
+ * Skeleton Loader for Loading State
+ */
+.masonry-skeleton {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.skeleton-loader {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/**
+ * Empty State
+ */
+.masonry-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 300px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-text {
+  color: #999;
+  font-size: 16px;
+  margin: 0;
+}
+
+/**
+ * Tablet Breakpoint (min-width: 768px)
+ * 3 columns on tablets
+ */
+@media (min-width: 768px) {
+  .masonry-grid {
+    column-count: var(--tablet-cols);
+  }
+}
+
+/**
+ * Desktop Breakpoint (min-width: 1024px)
+ * 4 columns on desktop
+ */
+@media (min-width: 1024px) {
+  .masonry-grid {
+    column-count: var(--desktop-cols);
+  }
+}
+
+/**
+ * Large Desktop Breakpoint (min-width: 1400px)
+ * Optional: 5 columns on very large screens
+ */
+@media (min-width: 1400px) {
+  .masonry-grid {
+    column-count: 5;
+  }
+}
+
+/**
+ * Extra Small Mobile (max-width: 480px)
+ * 1 column on very small phones for better readability
+ */
+@media (max-width: 480px) {
+  .masonry-grid {
+    column-count: 1;
+    column-gap: 0;
+  }
+  
+  .masonry-item {
+    margin-bottom: 16px;
+  }
+}
+
+/**
+ * Hover Effects (Desktop only)
+ */
+@media (hover: hover) and (pointer: fine) {
+  .masonry-item {
+    transition: transform 0.2s ease-out;
+  }
+  
+  .masonry-item:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/**
+ * Print Styles
+ */
+@media print {
+  .masonry-grid {
+    column-count: 2;
+  }
+  
+  .masonry-item {
+    break-inside: avoid;
+  }
+}

@@ -1,0 +1,135 @@
+/* Message Input Styles */
+.message-input-container {
+  padding: 15px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+}
+
+/* Reply Preview */
+.reply-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: rgba(66, 135, 245, 0.15);
+  border-left: 3px solid #4287f5;
+  border-radius: 6px;
+  position: relative;
+}
+
+.reply-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  min-width: max-content;
+}
+
+.reply-content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.reply-content small {
+  color: white;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+
+.btn-cancel-reply {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin-left: auto;
+}
+
+.btn-cancel-reply:hover {
+  color: white;
+}
+
+/* Input Form */
+.message-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.message-input-form .form-control {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.message-input-form .form-control:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(66, 135, 245, 0.5);
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(66, 135, 245, 0.25);
+}
+
+.message-input-form .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.message-input-form .form-control:disabled {
+  opacity: 0.6;
+}
+
+/* Send Button */
+.message-input-form .btn {
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.message-input-form .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Character Counter */
+.message-input-form small {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+}
+
+/* Error Alert */
+.alert-sm {
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .message-input-container {
+    padding: 10px 15px;
+  }
+
+  .message-input-form .btn span {
+    display: none;
+  }
+
+  .message-input-form .btn span.d-sm-inline {
+    display: inline;
+  }
+}
