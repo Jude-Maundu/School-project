@@ -57,7 +57,18 @@ app.use(helmet());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: { message: "Too many requests, please try again later." }
+  message: { message: "Too many requests, please try again later." },
+  keyGenerator: (req, res) => {
+    // When behind proxy, use X-Forwarded-For, otherwise use IP
+    if (app.get('trust proxy')) {
+      return req.headers['x-forwarded-for'] || req.ip;
+    }
+    return req.ip;
+  },
+  skip: (req, res) => {
+    // Skip rate limiting for test endpoints
+    return req.path === '/api/test' || req.path === '/test-token';
+  }
 });
 app.use("/api", limiter);
 

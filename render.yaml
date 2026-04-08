@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pm-backend
+    root_dir: Backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd ../PM-Frontend && npm install && npm run build && cd ../Backend
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
