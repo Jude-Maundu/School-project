@@ -3,12 +3,20 @@
  * Central location for all API endpoints
  */
 
-// Use environment variable with fallback to production URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://pm-backend-f3b6.onrender.com/api";
+// FORCE USE ONLINE SERVER - Remove localhost fallback
+const ONLINE_API_BASE_URL = "https://pm-backend-f3b6.onrender.com/api";
 
-// Only log in development
-if (process.env.NODE_ENV === 'development') {
-  console.log("[API] Using API_BASE_URL:", API_BASE_URL);
+// Override to always use online server
+const API_BASE_URL = ONLINE_API_BASE_URL;
+
+console.log("[API] Using API_BASE_URL:", API_BASE_URL);
+
+// Optional: Check if server is reachable (for debugging)
+if (typeof window !== "undefined") {
+  fetch(`${API_BASE_URL}/health`)
+    .then(res => res.json())
+    .then(data => console.log("[API] Backend health check:", data))
+    .catch(err => console.warn("[API] Backend not reachable:", err.message));
 }
 
 const API_ENDPOINTS = {

@@ -9,6 +9,7 @@ import { getImageUrl, fetchProtectedUrl } from "../../../utils/imageUrl";
 const BuyerAlbumAccess = () => {
   const { albumId, token } = useParams();
   const [mediaList, setMediaList] = useState([]);
+  const [albumDetails, setAlbumDetails] = useState(null);
   const [imageUrls, setImageUrls] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,6 +28,9 @@ const BuyerAlbumAccess = () => {
       const res = await axios.get(API_ENDPOINTS.MEDIA.ALBUM_ACCESS_VIEW(albumId, token), {
         timeout: 15000,
       });
+
+      // Capture album metadata when available
+      setAlbumDetails(res.data?.album || res.data || null);
 
       // Handle various response formats
       let items = [];
@@ -49,7 +53,6 @@ const BuyerAlbumAccess = () => {
           const needsProtected =
             !raw ||
             raw.includes("/opt/") ||
-            raw.includes("/uploads/") ||
             raw.startsWith("file://");
 
           if (needsProtected) {
@@ -101,6 +104,33 @@ const BuyerAlbumAccess = () => {
             Explore Photos
           </Link>
         </div>
+
+        {albumDetails && (
+          <div className="card bg-dark border-secondary mb-4">
+            <div className="row g-0 align-items-center">
+              <div className="col-md-4">
+                <img
+                  src={getImageUrl(albumDetails, placeholderMedium)}
+                  alt={albumDetails.name}
+                  className="img-fluid rounded-start h-100 w-100"
+                  style={{ objectFit: 'cover', minHeight: '180px' }}
+                />
+              </div>
+              <div className="col-md-8">
+                <div className="card-body">
+                  <h4 className="card-title text-white mb-2">{albumDetails.name || 'Album'}</h4>
+                  <p className="text-white-50 mb-2">{albumDetails.description || 'No album description provided.'}</p>
+                  <p className="text-warning mb-0">
+                    {albumDetails.price !== undefined ? `Album Price: KES ${albumDetails.price}` : ''}
+                  </p>
+                  {albumDetails.photographer && (
+                    <small className="text-white-50">By {albumDetails.photographer.username || albumDetails.photographerName}</small>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="alert alert-danger" role="alert">

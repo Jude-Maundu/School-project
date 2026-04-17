@@ -284,7 +284,7 @@ const HomePage = () => {
       </nav>
 
       {/* Add custom CSS for mobile menu styling */}
-      <style jsx="true">{`
+      <style>{`
         @media (max-width: 991px) {
           .navbar-collapse {
             background: rgba(0, 0, 0, 0.85);

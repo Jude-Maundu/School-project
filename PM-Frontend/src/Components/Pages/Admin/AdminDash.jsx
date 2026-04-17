@@ -19,6 +19,14 @@ const AdminDash = () => {
   });
   const [recentReceipts, setRecentReceipts] = useState([]);
   const [recentRefunds, setRecentRefunds] = useState([]);
+  const [shareSummary, setShareSummary] = useState({
+    totalShares: 0,
+    activeShares: 0,
+    expiredShares: 0,
+    totalAccesses: 0,
+    totalDownloads: 0,
+  });
+  const [recentShares, setRecentShares] = useState([]);
   const [popularMedia, setPopularMedia] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("week");
@@ -30,15 +38,19 @@ const AdminDash = () => {
       setLoading(true);
       
       const [
+        dashboardRes,
         mediaRes,
         receiptsRes,
         refundsRes,
         usersRes,
+        sharesRes,
       ] = await Promise.all([
+        axios.get(`${API}/payments/admin/dashboard`, { headers }).catch(() => ({ data: {} })),
         axios.get(`${API}/media`, { headers }),
         axios.get(`${API}/payments/admin/receipts`, { headers }),
         axios.get(`${API}/payments/admin/refunds`, { headers }),
         axios.get(`${API}/auth/users`, { headers }).catch(() => ({ data: [] })),
+        axios.get(`${API}/notifications/admin/shares?limit=6`, { headers }).catch(() => ({ data: {} })),
       ]);
 
       const media = Array.isArray(mediaRes.data?.media) 
@@ -51,21 +63,39 @@ const AdminDash = () => {
       const refunds = refundsRes.data || [];
       setRecentRefunds(refunds.filter(r => r.status === "pending").slice(0, 5));
       
-      const totalRevenue = receipts.reduce((sum, r) => sum + (r.amount || 0), 0);
-      const pendingRefunds = refunds.filter(r => r.status === "pending").length;
-      const totalUsers = Array.isArray(usersRes.data) ? usersRes.data.length : 0;
-      
+      const dashboardStats = dashboardRes.data?.stats || {};
+      const totalRevenue = dashboardStats.totalRevenue ?? receipts.reduce((sum, r) => sum + (r.amount || 0), 0);
+      const totalTransactions = dashboardStats.totalSales ?? receipts.length;
+      const totalUsers = dashboardStats.totalBuyers + dashboardStats.totalPhotographers + dashboardStats.totalAdmins || (Array.isArray(usersRes.data) ? usersRes.data.length : 0);
+      const pendingRefunds = dashboardStats.pendingRefunds ?? refunds.filter(r => r.status === "pending").length;
+      const photographerEarnings = dashboardStats.totalPhotographerEarnings ?? totalRevenue * 0.7;
+      const platformFees = totalRevenue - photographerEarnings;
+
+      const shares = Array.isArray(sharesRes.data?.shares) ? sharesRes.data.shares : [];
+      const totalAccesses = shares.reduce((sum, item) => sum + (item.accessCount || 0), 0);
+      const totalDownloads = shares.reduce((sum, item) => sum + (item.downloadCount || 0), 0);
+      const activeShares = shares.filter((item) => item.isActive).length;
+      const expiredShares = shares.filter((item) => item.isExpired).length;
+      setShareSummary({
+        totalShares: sharesRes.data?.total ?? shares.length,
+        activeShares,
+        expiredShares,
+        totalAccesses,
+        totalDownloads,
+      });
+      setRecentShares(shares.slice(0, 5));
+
       const popular = [...media].sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 5);
       setPopularMedia(popular);
       
       setStats({
         totalRevenue,
         totalUsers,
-        totalMedia: media.length,
-        totalTransactions: receipts.length,
+        totalMedia: dashboardStats.totalMedia ?? media.length,
+        totalTransactions,
         pendingRefunds,
-        photographerEarnings: totalRevenue * 0.7,
-        platformFees: totalRevenue * 0.3,
+        photographerEarnings,
+        platformFees,
       });
       
     } catch (error) {
@@ -89,7 +119,8 @@ const AdminDash = () => {
     { title: "Platform Fees", value: formatKES(stats.platformFees), icon: "fa-percent", color: "success", change: "30% share", bg: "rgba(40, 167, 69, 0.1)" },
     { title: "Total Media", value: stats.totalMedia, icon: "fa-photo-video", color: "primary", change: `${stats.totalMedia} items`, bg: "rgba(0, 123, 255, 0.1)" },
     { title: "Total Users", value: stats.totalUsers, icon: "fa-users", color: "purple", change: "active users", bg: "rgba(128, 0, 128, 0.1)" },
-    { title: "Transactions", value: stats.totalTransactions, icon: "fa-receipt", color: "orange", change: "completed", bg: "rgba(255, 165, 0, 0.1)" },
+    { title: "Active Shares", value: shareSummary.activeShares, icon: "fa-link", color: "info", change: `${shareSummary.totalShares} total`, bg: "rgba(23, 162, 184, 0.1)" },
+    { title: "Share Accesses", value: shareSummary.totalAccesses, icon: "fa-eye", color: "warning", change: `${shareSummary.totalDownloads} downloads`, bg: "rgba(255, 193, 7, 0.1)" },
     { title: "Pending Refunds", value: stats.pendingRefunds, icon: "fa-undo", color: "danger", change: "awaiting review", bg: "rgba(220, 53, 69, 0.1)" },
   ];
 
@@ -256,6 +287,90 @@ const AdminDash = () => {
             </div>
           </div>
 
+          {/* Share Monitoring */}
+          <div className="row g-3 mb-4">
+            <div className="col-12">
+              <div className="card border-0" style={{
+                background: "rgba(0, 0, 0, 0.3)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
+              }}>
+                <div className="card-header bg-transparent border-warning border-opacity-25 py-3 d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 className="fw-bold mb-1">
+                      <i className="fas fa-link me-2 text-warning"></i>
+                      Share Monitoring
+                    </h6>
+                    <p className="text-white-50 small mb-0">Track active share links, access count, and recent share activity.</p>
+                  </div>
+                  <Link to="/admin/shares" className="btn btn-sm btn-outline-warning">
+                    View All Shares
+                  </Link>
+                </div>
+                <div className="card-body">
+                  <div className="row g-3 mb-3">
+                    {[
+                      { title: "Total Shares", value: shareSummary.totalShares, icon: "fa-link", color: "warning" },
+                      { title: "Active Shares", value: shareSummary.activeShares, icon: "fa-eye", color: "info" },
+                      { title: "Expired Shares", value: shareSummary.expiredShares, icon: "fa-clock", color: "secondary" },
+                      { title: "Total Accesses", value: shareSummary.totalAccesses, icon: "fa-chart-line", color: "success" },
+                      { title: "Total Downloads", value: shareSummary.totalDownloads, icon: "fa-download", color: "primary" },
+                    ].map((card) => (
+                      <div className="col-md-4 col-lg-2" key={card.title}>
+                        <div className="card bg-dark border-secondary h-100 p-3">
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className={`badge bg-${card.color} text-dark`}>
+                              <i className={`fas ${card.icon}`}></i>
+                            </span>
+                            <small className="text-white-50">{card.title}</small>
+                          </div>
+                          <h4 className="fw-bold mb-0 text-white">{card.value}</h4>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="table-responsive">
+                    <table className="table table-dark table-hover mb-0">
+                      <thead>
+                        <tr>
+                          <th>Share Token</th>
+                          <th>Type</th>
+                          <th>Owner</th>
+                          <th>Accesses</th>
+                          <th>Downloads</th>
+                          <th>Remaining</th>
+                          <th>Expires</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentShares.length === 0 && (
+                          <tr>
+                            <td colSpan="7" className="text-center text-white-50 py-4">
+                              No share activity available.
+                            </td>
+                          </tr>
+                        )}
+                        {recentShares.map((share, idx) => (
+                          <tr key={idx}>
+                            <td className="text-truncate" style={{ maxWidth: '180px' }}>
+                              <small>{share.token}</small>
+                            </td>
+                            <td>{share.media ? "Media" : "Album"}</td>
+                            <td>{share.createdBy?.name || share.createdBy?.email || "Unknown"}</td>
+                            <td>{share.accessCount || 0}</td>
+                            <td>{share.downloadCount || 0}</td>
+                            <td>{share.remainingDownloads}</td>
+                            <td>{share.expiresAt ? new Date(share.expiresAt).toLocaleDateString() : "Never"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Recent Activity */}
           <div className="row g-3">
             <div className="col-lg-6">
@@ -310,7 +425,6 @@ const AdminDash = () => {
                 </div>
               </div>
             </div>
-
             <div className="col-lg-6">
               <div
                 className="card border-0"

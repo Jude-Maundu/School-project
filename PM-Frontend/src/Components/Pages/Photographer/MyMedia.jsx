@@ -32,8 +32,9 @@ const PhotographerMedia = () => {
         if (!photographerId) return;
         const res = await import("../../../api/API").then(m => m.getUser(photographerId));
         const profile = res.data || {};
-        setWatermark(profile.watermark || "");
+        setWatermark(profile.watermark?.trim() || "Relic Snap");
       } catch (err) {
+        setWatermark("Relic Snap");
         setWatermark("");
       }
     };

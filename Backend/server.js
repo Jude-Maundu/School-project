@@ -57,18 +57,7 @@ app.use(helmet());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: { message: "Too many requests, please try again later." },
-  keyGenerator: (req, res) => {
-    // When behind proxy, use X-Forwarded-For, otherwise use IP
-    if (app.get('trust proxy')) {
-      return req.headers['x-forwarded-for'] || req.ip;
-    }
-    return req.ip;
-  },
-  skip: (req, res) => {
-    // Skip rate limiting for test endpoints
-    return req.path === '/api/test' || req.path === '/test-token';
-  }
+  message: { message: "Too many requests, please try again later." }
 });
 app.use("/api", limiter);
 
@@ -186,6 +175,15 @@ async function ensureAdminUser() {
 // ==================== TEST ROUTES ====================
 app.get("/api/test", (req, res) => {
   res.json({ message: "Hello from the backend!" });
+});
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 app.get("/", (req, res) => {

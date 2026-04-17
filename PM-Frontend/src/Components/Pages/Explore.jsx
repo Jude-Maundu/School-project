@@ -675,7 +675,7 @@ const Explore = () => {
         </div>
       </div>
 
-      <style jsx="true">{`
+      <style>{`
         .transition-all {
           transition: all 0.3s ease;
         }

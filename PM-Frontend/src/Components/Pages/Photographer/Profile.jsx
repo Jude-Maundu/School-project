@@ -162,7 +162,7 @@ const PhotographerProfile = () => {
         joinedDate: userData?.createdAt || user?.createdAt || new Date().toISOString(),
         profileImage: savedProfileImage || userData?.profileImage || user?.profileImage || "",
         coverImage: savedCoverImage || userData?.coverImage || user?.coverImage || "",
-        watermark: userData?.watermark || user?.watermark || "",
+        watermark: userData?.watermark || user?.watermark || "Relic Snap",
       });
 
     } catch (error) {
@@ -183,7 +183,7 @@ const PhotographerProfile = () => {
     
     try {
       const updatePayload = {
-        name: profile.name,
+        username: profile.name,
         email: profile.email,
         bio: profile.bio,
         location: profile.location,
@@ -191,7 +191,8 @@ const PhotographerProfile = () => {
         social: profile.social,
         skills: profile.skills,
         equipment: profile.equipment,
-        watermark: profile.watermark || "",
+        watermark: profile.watermark || "Relic Snap",
+        profilePicture: profile.profileImage || "",
       };
 
       // Save to localStorage
@@ -491,16 +492,6 @@ const PhotographerProfile = () => {
                       className="form-control form-control-sm bg-dark text-white border-secondary"
                       value={profile.website}
                       onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label text-white-50 small">Watermark Text</label>
-                    <input
-                      type="text"
-                      className="form-control form-control-sm bg-dark text-white border-secondary"
-                      value={profile.watermark}
-                      onChange={(e) => setProfile({ ...profile, watermark: e.target.value })}
-                      placeholder="Your watermark text"
                     />
                   </div>
                 </>

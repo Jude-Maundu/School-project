@@ -176,7 +176,6 @@ const PhotographerDashboard = () => {
           const needsProtected =
             !raw ||
             raw.includes("/opt/") ||
-            raw.includes("/uploads/") ||
             raw.startsWith("file://");
 
           if (needsProtected) {

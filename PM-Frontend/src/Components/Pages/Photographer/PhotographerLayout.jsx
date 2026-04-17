@@ -366,7 +366,7 @@ const PhotographerLayout = ({ children }) => {
         <div style={{ paddingBottom: "70px" }}></div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .notification-wrapper {
           display: block;
         }

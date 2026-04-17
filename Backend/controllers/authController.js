@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import emailService from "../services/emailService.js";
 
+const DEFAULT_WATERMARK = "Relic Snap";
+
 // Register
 async function register(req, res) {
   try {
@@ -43,7 +45,8 @@ async function register(req, res) {
       password: hashedPassword,
       profilePicture,
       phoneNumber: phoneNumber || "",
-      role: role || "user"
+      role: role || "user",
+      watermark: req.body.watermark || DEFAULT_WATERMARK,
     });
 
     // Send welcome email
@@ -73,14 +76,10 @@ async function register(req, res) {
 // Login
 async function login(req, res) {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid email or password" });
-
-    if (role && role !== user.role) {
-      return res.status(400).json({ message: `Role mismatch: account belongs to ${user.role}` });
-    }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Invalid email or password" });
@@ -157,6 +156,10 @@ async function getUser(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    if (!user.watermark || user.watermark.trim() === "") {
+      user.watermark = DEFAULT_WATERMARK;
+    }
+
     const { password: pw, ...safeData } = user._doc;
     return res.status(200).json(safeData);
   } catch (error) {
@@ -168,10 +171,11 @@ async function getUser(req, res) {
 async function updateUser(req, res) {
   try {
     const { id } = req.params;
-    const { username, email, password, role, phoneNumber, watermark } = req.body;
+    const { username, name, email, password, role, phoneNumber, watermark, profilePicture } = req.body;
+    const resolvedUsername = username || name;
 
     // Validate required fields
-    if (!username || !email) {
+    if (!resolvedUsername || !email) {
       return res.status(400).json({ message: "Username and email are required" });
     }
 
@@ -179,7 +183,7 @@ async function updateUser(req, res) {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Update fields
-    user.username = username;
+    user.username = resolvedUsername;
     user.email = email;
     if (password) {
       user.password = await bcrypt.hash(password, 10);
@@ -202,12 +206,15 @@ async function updateUser(req, res) {
     if (req.file) {
       const profilePicUrl = req.file.secure_url || req.file.url || req.file.path || `/uploads/profiles/${req.file.filename}`;
       user.profilePicture = profilePicUrl;
+    } else if (typeof profilePicture === 'string' && profilePicture.trim() !== "") {
+      user.profilePicture = profilePicture;
     }
 
-
     // Update watermark if provided
-    if (typeof watermark === 'string') {
+    if (typeof watermark === 'string' && watermark.trim() !== "") {
       user.watermark = watermark;
+    } else if (!user.watermark || user.watermark.trim() === "") {
+      user.watermark = DEFAULT_WATERMARK;
     }
 
     // Update optional user metadata
@@ -294,6 +301,10 @@ async function getCurrentUser(req, res) {
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.watermark || user.watermark.trim() === "") {
+      user.watermark = DEFAULT_WATERMARK;
     }
 
     const { password: pw, ...safeData } = user._doc;

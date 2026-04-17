@@ -750,7 +750,7 @@ const PhotographerUpload = () => {
         </div>
       </div>
 
-      <style jsx="true">{`
+      <style>{`
         .cursor-pointer {
           cursor: pointer;
         }

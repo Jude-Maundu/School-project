@@ -263,7 +263,7 @@ const BuyerExplore = () => {
         await Promise.all(
           items.map(async (item) => {
             const raw = getImageUrl(item, null);
-            const needsProtected = !raw || raw.includes("/opt/") || raw.includes("/uploads/") || raw.startsWith("file://");
+            const needsProtected = !raw || raw.includes("/opt/") || raw.startsWith("file://");
             const isFree = !item.price || item.price <= 0;
             
             let imageUrl = raw;

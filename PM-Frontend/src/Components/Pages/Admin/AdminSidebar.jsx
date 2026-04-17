@@ -38,6 +38,12 @@ const AdminSidebar = ({ isOpen, onToggle, onNav }) => {
       badge: null,
     },
     {
+      path: "/admin/shares",
+      icon: "fa-link",
+      label: "Shares",
+      badge: null,
+    },
+    {
       path: "/admin/receipts",
       icon: "fa-receipt",
       label: "Receipts",

@@ -91,8 +91,6 @@ const Register = () => {
       setTimeout(() => {
         if (role === "photographer") {
           navigate("/photographer/dashboard");
-        } else if (role === "institution") {
-          navigate("/buyer/dashboard"); // Institutions use buyer dashboard for now
         } else {
           navigate("/buyer/dashboard");
         }
@@ -366,8 +364,7 @@ const Register = () => {
                 <div className="d-flex gap-2">
                   {[
                     { value: "user", icon: "fa-user", label: "User", desc: "Buy photos" },
-                    { value: "photographer", icon: "fa-camera", label: "Photographer", desc: "Sell photos" },
-                    { value: "institution", icon: "fa-building", label: "Institution", desc: "Post event photos" }
+                    { value: "photographer", icon: "fa-camera", label: "Photographer", desc: "Sell photos" }
                   ].map((r) => (
                     <div 
                       className="flex-fill text-center p-2 cursor-pointer"

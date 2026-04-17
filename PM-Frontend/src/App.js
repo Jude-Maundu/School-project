@@ -20,6 +20,8 @@ import AdminReceipts from './Components/Pages/Admin/AdminReceipts';
 import AdminRefunds from './Components/Pages/Admin/AdminRefunds';
 import AdminSettings from './Components/Pages/Admin/AdminSettings';
 import AdminAudit from './Components/Pages/Admin/AdminAudit';
+import AdminShares from './Components/Pages/Admin/AdminShares';
+import ShareAccess from './Components/Pages/Buyer/ShareAccess';
 
 // Photographer Pages
 import PhotographerDash from './Components/Pages/Photographer/PhotographerDash';
@@ -60,21 +62,6 @@ function RouteWithBodyClass({ children }) {
   return children;
 }
 
-function RoleLanding() {
-  const token = localStorage.getItem('token');
-  const role = String(localStorage.getItem('role') || '').toLowerCase();
-
-  // If user is logged in, redirect to their dashboard
-  if (token && role) {
-    if (role.includes('admin')) return <Navigate to="/admin/dashboard" replace />;
-    if (role.includes('photographer')) return <Navigate to="/photographer/dashboard" replace />;
-    return <Navigate to="/buyer/dashboard" replace />;
-  }
-  
-  // If not logged in, show the public explore page as landing
-  return <Navigate to="/explore" replace />;
-}
-
 function App() {
   return (
     <BrowserRouter>
@@ -91,10 +78,15 @@ function App() {
           <Route path='/admin/dashboard' element={<ProtectedRoute requiredRole="admin"><AdminDash /></ProtectedRoute>} />
           <Route path="/admin/media" element={<ProtectedRoute requiredRole="admin"><AdminMedia /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><AdminUser /></ProtectedRoute>} />
+          <Route path="/admin/photographers" element={<ProtectedRoute requiredRole="admin"><AdminUser /></ProtectedRoute>} />
+          <Route path="/admin/transactions" element={<ProtectedRoute requiredRole="admin"><AdminReceipts /></ProtectedRoute>} />
+          <Route path="/admin/reports" element={<ProtectedRoute requiredRole="admin"><AdminAudit /></ProtectedRoute>} />
           <Route path="/admin/analytics" element={<ProtectedRoute requiredRole="admin"><AdminDash /></ProtectedRoute>} />
+          <Route path="/admin/shares" element={<ProtectedRoute requiredRole="admin"><AdminShares /></ProtectedRoute>} />
           <Route path="/admin/receipts" element={<ProtectedRoute requiredRole="admin"><AdminReceipts /></ProtectedRoute>} />
           <Route path="/admin/refunds" element={<ProtectedRoute requiredRole="admin"><AdminRefunds /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute requiredRole="admin"><AdminSettings /></ProtectedRoute>} />
+          <Route path="/admin/profile" element={<ProtectedRoute requiredRole="admin"><AdminSettings /></ProtectedRoute>} />
           <Route path="/admin/audit" element={<ProtectedRoute requiredRole="admin"><AdminAudit /></ProtectedRoute>} />
           
           {/* Photographer Routes */}
@@ -120,6 +112,7 @@ function App() {
           <Route path="/buyer/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
           <Route path="/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
           <Route path="/album/:albumId/access/:token" element={<ProtectedRoute requiredRole="buyer"><BuyerAlbumAccess /></ProtectedRoute>} />
+          <Route path="/share/:token" element={<ShareAccess />} />
 
           {/* Catch-all fallback */}
           <Route path="*" element={<Navigate to="/explore" replace />} />
